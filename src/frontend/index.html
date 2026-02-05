@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HMS MVP</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 24px; background: #f8fafc; }
+      .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+      h1, h2 { margin-top: 0; }
+      form { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+      input, select, textarea, button { padding: 8px; font-size: 14px; }
+      textarea { min-height: 70px; }
+      .full { grid-column: 1 / -1; }
+      table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+      th, td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
+      #app { display: none; }
+      .muted { color: #64748b; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <h1>Hospital Management System - MVP</h1>
+
+    <div id="loginCard" class="card">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <input id="email" type="email" placeholder="Email" required />
+        <input id="password" type="password" placeholder="Password" required />
+        <button class="full" type="submit">Sign In</button>
+      </form>
+      <p class="muted">Seed users: admin@hms.local, doctor@hms.local, nurse@hms.local, reception@hms.local / Password123!</p>
+      <p id="loginMessage"></p>
+    </div>
+
+    <div id="app">
+      <div class="card">
+        <h2>Session</h2>
+        <p id="whoami"></p>
+        <button id="logoutBtn">Logout</button>
+      </div>
+
+      <div class="card">
+        <h2>Register Patient</h2>
+        <form id="patientForm">
+          <input id="mrn" placeholder="MRN" required />
+          <input id="firstName" placeholder="First Name" required />
+          <input id="lastName" placeholder="Last Name" required />
+          <input id="dateOfBirth" type="date" required />
+          <select id="sex" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <input id="phone" placeholder="Phone" required />
+          <input id="address" placeholder="Address" />
+          <input id="emergencyContact" placeholder="Emergency Contact" />
+          <button class="full" type="submit">Create Patient</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Schedule Appointment</h2>
+        <form id="appointmentForm">
+          <input id="patientId" placeholder="Patient ID" required />
+          <input id="doctorId" placeholder="Doctor User ID" required />
+          <input id="scheduledAt" type="datetime-local" required />
+          <input id="reason" placeholder="Reason" />
+          <button class="full" type="submit">Create Appointment</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Record Encounter (Doctor)</h2>
+        <form id="encounterForm">
+          <input id="encPatientId" placeholder="Patient ID" required />
+          <input id="encAppointmentId" placeholder="Appointment ID (optional)" />
+          <textarea id="diagnosisNotes" placeholder="Diagnosis Notes" class="full" required></textarea>
+          <textarea id="vitals" placeholder="Vitals" class="full"></textarea>
+          <textarea id="prescribedMeds" placeholder="Prescribed Medications" class="full"></textarea>
+          <button class="full" type="submit">Record Encounter</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Today's Appointments</h2>
+        <button id="refreshAppointments">Refresh</button>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Time</th><th>Status</th></tr>
+          </thead>
+          <tbody id="appointmentRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
