@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  NURSE
+  RECEPTIONIST
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           String            @id @default(cuid())
+  fullName     String
+  email        String            @unique
+  passwordHash String
+  role         Role
+  isActive     Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  doctorSchedules DoctorSchedule[]
+  appointmentsAsDoctor Appointment[] @relation("DoctorAppointments")
+  encountersAsDoctor Encounter[] @relation("DoctorEncounters")
+}
+
+model Patient {
+  id             String        @id @default(cuid())
+  mrn            String        @unique
+  firstName      String
+  lastName       String
+  dateOfBirth    DateTime
+  sex            String
+  phone          String
+  address        String?
+  emergencyContact String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  appointments   Appointment[]
+  encounters     Encounter[]
+}
+
+model DoctorSchedule {
+  id            String    @id @default(cuid())
+  doctorId      String
+  weekday       Int
+  startTime     String
+  endTime       String
+  location      String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  doctor        User      @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, weekday, startTime, endTime])
+}
+
+model Appointment {
+  id               String             @id @default(cuid())
+  patientId         String
+  doctorId          String
+  scheduledAt       DateTime
+  reason            String?
+  status            AppointmentStatus @default(SCHEDULED)
+  createdByUserId   String
+  cancellationReason String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  patient           Patient            @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  doctor            User               @relation("DoctorAppointments", fields: [doctorId], references: [id], onDelete: Restrict)
+
+  @@index([doctorId, scheduledAt])
+  @@index([patientId, scheduledAt])
+}
+
+model Encounter {
+  id                 String    @id @default(cuid())
+  patientId          String
+  appointmentId      String?   @unique
+  doctorId           String
+  visitDate          DateTime  @default(now())
+  chiefComplaint     String?
+  diagnosisNotes     String
+  vitals             String?
+  prescribedMeds     String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  patient            Patient   @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  doctor             User      @relation("DoctorEncounters", fields: [doctorId], references: [id], onDelete: Restrict)
+
+  @@index([patientId, visitDate])
+  @@index([doctorId, visitDate])
+}
